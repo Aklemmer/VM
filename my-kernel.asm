@@ -18,19 +18,72 @@
 	ADDUS	*+free_space_pointer	+free_space_pointer	4 ;Save the end of the statics (first free space) into the free_space_pointer
 	COPY	%G0	*+free_space_pointer
 	;; ADDUS	*+process_table		+free_space_pointer	4
-	ADDUS	*+kernel_end		+free_space_pointer	1000
+	ADDUS	*+kernel_end		+free_space_pointer	16000
 	COPY	%SP	*+kernel_end
 	COPY	%FP	%SP
 	ADDUS *+newPortion	%SP	16
+
+page_the_kernel:	
+	;; Caller prologue
+
+	SUBUS	%SP	%SP	12
+	COPY	*%SP	%FP
+	SUBUS	%SP	%SP	4
+	COPY	*%SP	1024
+	COPY	%FP	%SP
+	ADDUS	%G0	%FP	8
+
+	;; Call memalloc
+	CALL	+_procedure_mem_alloc	*%G0
+
+	;; Caller epilogue
+	SUBUS	%FP	%FP	4
+	COPY	%FP	*%FP
+	ADDUS	%SP	%SP	16
+
+	SUBUS	%G3	%SP	4
+	COPY	*+kernel_Upper_Page_Table *%G3
+	COPY	%G4	*+kernel_Upper_Page_Table
 	
-	COPY	%G0	0x00001000 ;%G0 holds the bus controller base
-	COPY	%G1	0x00001008
-	COPY	%G1	*%G1
-	COPY	%G2	0
+	;; Caller prologue
+	SUBUS	%SP	%SP	12
+	COPY	*%SP	%FP
+	SUBUS	%SP	%SP	4
+	COPY	*%SP	1024
+	COPY	%FP	%SP
+	ADDUS	%G0	%FP	8
+	
+	;; Call memalloc
+	CALL	+_procedure_special_mem_alloc	*%G0
+
+	;; Caller epilogue
+	SUBUS	%FP	%FP	4
+	COPY	%FP	*%FP
+	ADDUS	%SP	%SP	16
+
+	SUBUS	%G4	%SP	4
+	COPY	*+kernel_Lower_Page_Table *%G4
+	COPY	%G0	*+kernel_Upper_Page_Table
+	ADDUS	*%G0	*%G4	0x1f
+
+	ADDUS	%G1	*+kernel_Lower_Page_Table	4096
+	COPY	%G2	*+kernel_Lower_Page_Table
+	COPY	%G3	0b0000000011111
+	
+pageLoopTop:
+	BGT	+fin	%G2	%G1
+	COPY	*%G2	%G3
+	ADDUS	%G3	%G3	0b1000000000000
+	ADDUS	%G2	%G2	4
+	JUMP	+pageLoopTop
+	
+fin:    SETPTR  *+kernel_Upper_Page_Table
+	JUMPMD +ROMloop 0xc	
+	COPY	%G0	*+kernel_Upper_Page_Table
+	COPY	%G1	*+kernel_Lower_Page_Table
 	
 ROMloop:
 	BEQ	+init	*%G0	0
-
 	;;If the type is = 2:
 	;; 	increment count & check if this is 3rd rom (aka init)
 	BNEQ	+ROMloopbottom	*%G0	2
@@ -63,7 +116,7 @@ init:	ADDUS	%G0	*+process_table		8
 	ADDUS	%G0	%G0	4
 	SETLM	*%G0
 	COPY	%G0	0
-	JUMPMD	%G0	6
+	JUMPMD	%G0	14
 	
 
 
@@ -243,8 +296,8 @@ EXECUTE:
 	COPY	%FP	%SP
 	ADDUS	%G0	%FP	8
 
-	;; Call mem_alloc
-	CALL	+mem_alloc	*%G0
+	;; Call memalloc
+	CALL	+_procedure_mem_alloc	*%G0
 
 	;; Caller epilogue
 	SUBUS	%FP	%FP	4
@@ -347,8 +400,32 @@ skip:	ADDUS	%FP	%FP	8
 ;;; mem_alloc procedure allocates memory in kernerls heap
 	;; Parameters: [%FP] = # of spaces requested
 	;; Returns: free space pointer
+_procedure_special_mem_alloc:
+	;; Preserve Registers 
+	SUBUS	%SP	%SP	4
+	COPY	*%SP	%G1
+	SUBUS	%SP	%SP	4
+	COPY	*%SP	%G2
 
-mem_alloc:
+	
+	COPY	%G2	*+free_space_pointer
+	MOD	%G2	%G2	4096
+	SUBUS 	%G3	4096	%G2		
+	ADDUS	*+free_space_pointer	%G3	*+free_space_pointer
+	
+	COPY	%G0	*%FP
+	ADDUS	%G2	%FP	12
+	COPY	*%G2	*+free_space_pointer  ;Return value set to pointer
+	ADDUS	*+free_space_pointer	*+free_space_pointer	%G0 ;free_space_pointer now holds an incremented value
+
+	;; Reset registers
+	COPY	%G2	*%SP
+	ADDUS	%SP	%SP	4
+	COPY	%G1	*%SP
+	ADDUS	%SP	%SP	4
+	ADDUS	%FP	%FP	8
+	JUMP	*%FP
+_procedure_mem_alloc:
 
 	;; Preserve Registers 
 	SUBUS	%SP	%SP	4
@@ -495,7 +572,7 @@ RUN:
 
 	COPY	%SP *%SP
 
-	JUMPMD	*+y	6
+	JUMPMD	*+y	14
 
 
 
@@ -616,9 +693,10 @@ find_device_return:
 	
 null_interrupt:	HALT
 	.Numeric
+kernel_Upper_Page_Table:	0
+kernel_Lower_Page_Table:	0
 
-
-	_static_device_table_base: 	0x00001000
+_static_device_table_base: 	0x00001000
 _static_dt_entry_size:		12
 _static_dt_base_offset:		4
 _static_dt_limit_offset:	8

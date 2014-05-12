@@ -20,6 +20,405 @@
 
 	.Code
 
+; No assembly for externally defined procedure mem_alloc
+; No assembly for externally defined procedure find_device
+	;; Procedure entry point
+_procedure_pageKernel:
+	;; Callee for pageKernel: (prologue) Push locals
+	SUBUS		%SP		%SP		20		; Push locals
+
+	;; Start begin-end statement
+	;; Statement #0 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Call to mem_alloc: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to mem_alloc: (prologue b) Evaluate and push arguments
+	;; Call to mem_alloc:   Argument #0
+	;; Push integer value 1024 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		1024				; Copy the value
+
+	;; Call to mem_alloc: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		4		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to mem_alloc
+	ADDUS		%G0		%SP		8		; %G0 = &ra
+	CALL		+_procedure_mem_alloc		*%G0				; Do call
+	;; Call to mem_alloc: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		4		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to mem_alloc: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		12		; Pop args/pfp/ra
+	;; Call to =:   Argument #0
+	;; Reference UPbase
+	;; Push the address of dynamic variable UPbase
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-8		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #1 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Call to mem_alloc: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to mem_alloc: (prologue b) Evaluate and push arguments
+	;; Call to mem_alloc:   Argument #0
+	;; Push integer value 1024 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		1024				; Copy the value
+
+	;; Call to mem_alloc: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		4		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to mem_alloc
+	ADDUS		%G0		%SP		8		; %G0 = &ra
+	CALL		+_procedure_mem_alloc		*%G0				; Do call
+	;; Call to mem_alloc: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		4		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to mem_alloc: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		12		; Pop args/pfp/ra
+	;; Call to =:   Argument #0
+	;; Reference LPbase
+	;; Push the address of dynamic variable LPbase
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-12		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #2 of begin-end statement
+	;; A literal assembly injection
+	SUBUS	%FP	%FP 8
+		COPY  *+kernel_Upper_Page_Table *%FP
+		SUBUS	%FP	%FP 4
+		COPY  *+kernel_Lower_Page_Table	*%FP
+		ADDUS	%FP	%FP 12
+	;; Statement #3 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Identifier evaluation: LPbase
+
+	;; Evaluate dynamic variable LPbase
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-12		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to =:   Argument #0
+	;; Dereference #41: Prelude -- evaluate the src pointer
+	;; Identifier evaluation: UPbase
+
+	;; Evaluate dynamic variable UPbase
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-8		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	COPY		%G0		*%SP				; %G0 = src
+	ADDUS		%SP		%SP		4		; Pop src pointer
+	SUBUS		%SP		%SP		4		; Push dst space
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #4 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Call to +: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to +: (prologue b) Evaluate and push arguments
+	;; Call to +:   Argument #1
+	;; Push integer value 1024 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		1024				; Copy the value
+
+	;; Call to +:   Argument #0
+	;; Identifier evaluation: LPbase
+
+	;; Evaluate dynamic variable LPbase
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-12		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to +: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to +
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_+		*%G0				; Do call
+	;; Call to +: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to +: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Call to =:   Argument #0
+	;; Reference LPlim
+	;; Push the address of dynamic variable LPlim
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-16		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #5 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Push integer value 11111 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		11111				; Copy the value
+
+	;; Call to =:   Argument #0
+	;; Reference num
+	;; Push the address of dynamic variable num
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-20		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #6 of begin-end statement
+	;; While 83: (a) Evaluate the conditional expression, leaving its result on top of the stack
+_procedure_pageKernel_loop_83_top:
+	;; Call to <: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to <: (prologue b) Evaluate and push arguments
+	;; Call to <:   Argument #1
+	;; Identifier evaluation: LPlim
+
+	;; Evaluate dynamic variable LPlim
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-16		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to <:   Argument #0
+	;; Identifier evaluation: LPbase
+
+	;; Evaluate dynamic variable LPbase
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-12		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to <: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to <
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_<		*%G0				; Do call
+	;; Call to <: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to <: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; While 83: (b) Pop conditional result and branch (or not)
+	COPY		%G0		*%SP				; Copy result
+	ADDUS		%SP		%SP		4		; Pop result
+	BEQ		_procedure_pageKernel_loop_83_end		%G0		0		; Jump if false
+	;; While 83: (c) Body
+
+	;; Start begin-end statement
+	;; Statement #0 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Identifier evaluation: num
+
+	;; Evaluate dynamic variable num
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-20		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to =:   Argument #0
+	;; Reference LPbase
+	;; Push the address of dynamic variable LPbase
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-12		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #1 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Call to +: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to +: (prologue b) Evaluate and push arguments
+	;; Call to +:   Argument #1
+	;; Push integer value 0x00001000 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		0x00001000				; Copy the value
+
+	;; Call to +:   Argument #0
+	;; Identifier evaluation: num
+
+	;; Evaluate dynamic variable num
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-20		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to +: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to +
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_+		*%G0				; Do call
+	;; Call to +: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to +: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Call to =:   Argument #0
+	;; Reference num
+	;; Push the address of dynamic variable num
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-20		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Statement #2 of begin-end statement
+	;; Call to =: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to =: (prologue b) Evaluate and push arguments
+	;; Call to =:   Argument #1
+	;; Call to +: (prologue a) Create base of caller frame segment
+	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
+	;; Call to +: (prologue b) Evaluate and push arguments
+	;; Call to +:   Argument #1
+	;; Push integer value 4 onto stack
+	SUBUS		%SP		%SP		4		; Push word space
+	COPY		*%SP		4				; Copy the value
+
+	;; Call to +:   Argument #0
+	;; Identifier evaluation: LPbase
+
+	;; Evaluate dynamic variable LPbase
+	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
+	ADDUS		%G0		%FP		-12		; %G0 = src = %FP + offset
+	COPY		*%SP		*%G0				; *dst = *src
+	;; Call to +: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to +
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_+		*%G0				; Do call
+	;; Call to +: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to +: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; Call to =:   Argument #0
+	;; Reference LPbase
+	;; Push the address of dynamic variable LPbase
+
+	SUBUS		%SP		%SP		4		; Push pointer space
+	ADDUS		*%SP		%FP		-12		; src = %FP + offset
+	;; Call to =: (prologue c) Preserve and update frame pointer
+	ADDUS		%G0		%SP		8		; %G0 = &pfp
+	COPY		*%G0		%FP				; pfp = %FP
+	COPY		%FP		%SP				; %FP = %SP
+	;; Call to =
+	ADDUS		%G0		%SP		12		; %G0 = &ra
+	CALL		+_procedure_=		*%G0				; Do call
+	;; Call to =: (epilogue a) Restore FP
+	ADDUS		%G0		%FP		8		; %G0 = &pfp
+	COPY		%FP		*%G0				; Restore FP
+	;; Call to =: (epilogue b) Pop all but rv
+	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
+	;; While 83: (d) Iterate
+	JUMP		_procedure_pageKernel_loop_83_top						; Jump to top of loop
+	;; While 83: (e) Loop's end
+_procedure_pageKernel_loop_83_end:
+	NOOP								; Placeholder
+	;; Statement #7 of begin-end statement
+	;; A literal assembly injection
+SUBUS %FP %FP 8 
+     SETPTR  *%FP
+     JUMPMD +jump c 
+jump: ADDUS %FP %FP 8
+_procedure_pageKernel_epilogue:
+	;; Callee for pageKernel: (epilogue) Pop locals and return
+
+	COPY		%SP		%FP				; Pop locals and temp results
+	ADDUS		%G0		%FP		4		; %G0 = &ra
+	JUMP		*%G0						; Return to caller
+
 	;; Procedure entry point
 _procedure_=:
 	;; Callee for =: (prologue) Push locals
@@ -32,8 +431,8 @@ _procedure_=:
        COPY	 %G1	*%FP		; %G1 = destination
 	      COPY	 *%G1	*%G0		; *destination = value
 	;; Statement #1 of begin-end statement
-	;; Return statement 11 from =: (a) Evaluate the expression and prepare the destination
-	;; Dereference #10: Prelude -- evaluate the src pointer
+	;; Return statement 96 from =: (a) Evaluate the expression and prepare the destination
+	;; Dereference #95: Prelude -- evaluate the src pointer
 	;; Identifier evaluation: destination
 
 	;; Evaluate dynamic variable destination
@@ -44,10 +443,10 @@ _procedure_=:
 	ADDUS		%SP		%SP		4		; Pop src pointer
 	SUBUS		%SP		%SP		4		; Push dst space
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 11 from =: (b) Copy single-word return value into place
+	;; Return statement 96 from =: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 11 from =: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 96 from =: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_=_epilogue						; Return to caller
 _procedure_=_epilogue:
 	;; Callee for =: (epilogue) Pop locals and return
@@ -68,17 +467,17 @@ _procedure_bitand:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      AND	 *%G0	*%FP	*%G1	; result = x & y
 	;; Statement #1 of begin-end statement
-	;; Return statement 23 from bitand: (a) Evaluate the expression and prepare the destination
+	;; Return statement 108 from bitand: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 23 from bitand: (b) Copy single-word return value into place
+	;; Return statement 108 from bitand: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 23 from bitand: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 108 from bitand: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_bitand_epilogue						; Return to caller
 _procedure_bitand_epilogue:
 	;; Callee for bitand: (epilogue) Pop locals and return
@@ -99,17 +498,17 @@ _procedure_bitor:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      OR	 *%G0	*%FP	*%G1	; result = x | y
 	;; Statement #1 of begin-end statement
-	;; Return statement 35 from bitor: (a) Evaluate the expression and prepare the destination
+	;; Return statement 120 from bitor: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 35 from bitor: (b) Copy single-word return value into place
+	;; Return statement 120 from bitor: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 35 from bitor: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 120 from bitor: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_bitor_epilogue						; Return to caller
 _procedure_bitor_epilogue:
 	;; Callee for bitor: (epilogue) Pop locals and return
@@ -129,17 +528,17 @@ _procedure_bitnot:
 	      ADDUS	 %G0	%FP	-4	; %G0 = &result
 	      NOT	 *%G0	*%FP		; result = ~x
 	;; Statement #1 of begin-end statement
-	;; Return statement 45 from bitnot: (a) Evaluate the expression and prepare the destination
+	;; Return statement 130 from bitnot: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 45 from bitnot: (b) Copy single-word return value into place
+	;; Return statement 130 from bitnot: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 45 from bitnot: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 130 from bitnot: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_bitnot_epilogue						; Return to caller
 _procedure_bitnot_epilogue:
 	;; Callee for bitnot: (epilogue) Pop locals and return
@@ -160,17 +559,17 @@ _procedure_<<:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      SHFTL	 *%G0	*%FP	*%G1	; result = x << y
 	;; Statement #1 of begin-end statement
-	;; Return statement 57 from <<: (a) Evaluate the expression and prepare the destination
+	;; Return statement 142 from <<: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 57 from <<: (b) Copy single-word return value into place
+	;; Return statement 142 from <<: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 57 from <<: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 142 from <<: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_<<_epilogue						; Return to caller
 _procedure_<<_epilogue:
 	;; Callee for <<: (epilogue) Pop locals and return
@@ -191,17 +590,17 @@ _procedure_>>:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      SHFTR	 *%G0	*%FP	*%G1	; result = x << y
 	;; Statement #1 of begin-end statement
-	;; Return statement 69 from >>: (a) Evaluate the expression and prepare the destination
+	;; Return statement 154 from >>: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 69 from >>: (b) Copy single-word return value into place
+	;; Return statement 154 from >>: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 69 from >>: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 154 from >>: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_>>_epilogue						; Return to caller
 _procedure_>>_epilogue:
 	;; Callee for >>: (epilogue) Pop locals and return
@@ -217,7 +616,7 @@ _procedure_and:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; If-then 90: (a) Evaluate the conditional expression, leaving its result on top of the stack
+	;; If-then 175: (a) Evaluate the conditional expression, leaving its result on top of the stack
 	;; Call to !=: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to !=: (prologue b) Evaluate and push arguments
@@ -245,15 +644,15 @@ _procedure_and:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to !=: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; If-then 90: (b) Pop conditional result and branch (or not)
+	;; If-then 175: (b) Pop conditional result and branch (or not)
 	COPY		%G0		*%SP				; %G0 = conditional result
 	ADD		%SP		%SP		4		; Pop result
-	BEQ		_and_branch_90_end		%G0		0		; If false, jump over then-branch
-	;; If-then 90: (c) Then-branch
+	BEQ		_and_branch_175_end		%G0		0		; If false, jump over then-branch
+	;; If-then 175: (c) Then-branch
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; If-then 88: (a) Evaluate the conditional expression, leaving its result on top of the stack
+	;; If-then 173: (a) Evaluate the conditional expression, leaving its result on top of the stack
 	;; Call to !=: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to !=: (prologue b) Evaluate and push arguments
@@ -281,40 +680,40 @@ _procedure_and:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to !=: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; If-then 88: (b) Pop conditional result and branch (or not)
+	;; If-then 173: (b) Pop conditional result and branch (or not)
 	COPY		%G0		*%SP				; %G0 = conditional result
 	ADD		%SP		%SP		4		; Pop result
-	BEQ		_and_branch_88_end		%G0		0		; If false, jump over then-branch
-	;; If-then 88: (c) Then-branch
+	BEQ		_and_branch_173_end		%G0		0		; If false, jump over then-branch
+	;; If-then 173: (c) Then-branch
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 86 from and: (a) Evaluate the expression and prepare the destination
+	;; Return statement 171 from and: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 1 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		1				; Copy the value
 
-	;; Return statement 86 from and: (b) Copy single-word return value into place
+	;; Return statement 171 from and: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 86 from and: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 171 from and: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_and_epilogue						; Return to caller
-	;; If-then 88: (d) End
-_and_branch_88_end:
-	NOOP								; Placeholder for if-then 88
-	;; If-then 90: (d) End
-_and_branch_90_end:
-	NOOP								; Placeholder for if-then 90
+	;; If-then 173: (d) End
+_and_branch_173_end:
+	NOOP								; Placeholder for if-then 173
+	;; If-then 175: (d) End
+_and_branch_175_end:
+	NOOP								; Placeholder for if-then 175
 	;; Statement #1 of begin-end statement
-	;; Return statement 92 from and: (a) Evaluate the expression and prepare the destination
+	;; Return statement 177 from and: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 0 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		0				; Copy the value
 
-	;; Return statement 92 from and: (b) Copy single-word return value into place
+	;; Return statement 177 from and: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 92 from and: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 177 from and: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_and_epilogue						; Return to caller
 _procedure_and_epilogue:
 	;; Callee for and: (epilogue) Pop locals and return
@@ -330,7 +729,7 @@ _procedure_or:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; If-then 107: (a) Evaluate the conditional expression, leaving its result on top of the stack
+	;; If-then 192: (a) Evaluate the conditional expression, leaving its result on top of the stack
 	;; Call to !=: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to !=: (prologue b) Evaluate and push arguments
@@ -358,29 +757,29 @@ _procedure_or:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to !=: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; If-then 107: (b) Pop conditional result and branch (or not)
+	;; If-then 192: (b) Pop conditional result and branch (or not)
 	COPY		%G0		*%SP				; %G0 = conditional result
 	ADD		%SP		%SP		4		; Pop result
-	BEQ		_or_branch_107_end		%G0		0		; If false, jump over then-branch
-	;; If-then 107: (c) Then-branch
+	BEQ		_or_branch_192_end		%G0		0		; If false, jump over then-branch
+	;; If-then 192: (c) Then-branch
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 105 from or: (a) Evaluate the expression and prepare the destination
+	;; Return statement 190 from or: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 1 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		1				; Copy the value
 
-	;; Return statement 105 from or: (b) Copy single-word return value into place
+	;; Return statement 190 from or: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 105 from or: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 190 from or: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_or_epilogue						; Return to caller
-	;; If-then 107: (d) End
-_or_branch_107_end:
-	NOOP								; Placeholder for if-then 107
+	;; If-then 192: (d) End
+_or_branch_192_end:
+	NOOP								; Placeholder for if-then 192
 	;; Statement #1 of begin-end statement
-	;; If-then 115: (a) Evaluate the conditional expression, leaving its result on top of the stack
+	;; If-then 200: (a) Evaluate the conditional expression, leaving its result on top of the stack
 	;; Call to !=: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to !=: (prologue b) Evaluate and push arguments
@@ -408,37 +807,37 @@ _or_branch_107_end:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to !=: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; If-then 115: (b) Pop conditional result and branch (or not)
+	;; If-then 200: (b) Pop conditional result and branch (or not)
 	COPY		%G0		*%SP				; %G0 = conditional result
 	ADD		%SP		%SP		4		; Pop result
-	BEQ		_or_branch_115_end		%G0		0		; If false, jump over then-branch
-	;; If-then 115: (c) Then-branch
+	BEQ		_or_branch_200_end		%G0		0		; If false, jump over then-branch
+	;; If-then 200: (c) Then-branch
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 113 from or: (a) Evaluate the expression and prepare the destination
+	;; Return statement 198 from or: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 1 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		1				; Copy the value
 
-	;; Return statement 113 from or: (b) Copy single-word return value into place
+	;; Return statement 198 from or: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 113 from or: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 198 from or: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_or_epilogue						; Return to caller
-	;; If-then 115: (d) End
-_or_branch_115_end:
-	NOOP								; Placeholder for if-then 115
+	;; If-then 200: (d) End
+_or_branch_200_end:
+	NOOP								; Placeholder for if-then 200
 	;; Statement #2 of begin-end statement
-	;; Return statement 117 from or: (a) Evaluate the expression and prepare the destination
+	;; Return statement 202 from or: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 0 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		0				; Copy the value
 
-	;; Return statement 117 from or: (b) Copy single-word return value into place
+	;; Return statement 202 from or: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 117 from or: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 202 from or: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_or_epilogue						; Return to caller
 _procedure_or_epilogue:
 	;; Callee for or: (epilogue) Pop locals and return
@@ -454,44 +853,44 @@ _procedure_not:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; If-then-else 128: (a) Evaluate the conditional expression, leaving its result on top of the stack
+	;; If-then-else 213: (a) Evaluate the conditional expression, leaving its result on top of the stack
 	;; Identifier evaluation: x
 
 	;; Evaluate dynamic variable x
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		0		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; If-then-else 128: (b) Pop conditional result and branch (or not)
+	;; If-then-else 213: (b) Pop conditional result and branch (or not)
 	COPY		%G0		*%SP				; %G0 = conditional result
 	ADD		%SP		%SP		4		; Pop result
-	BEQ		_not_branch_128_else		%G0		0		; If false, jump to else-branch
-	;; If-then-else 128: (c) Then-branch
-	;; Return statement 125 from not: (a) Evaluate the expression and prepare the destination
+	BEQ		_not_branch_213_else		%G0		0		; If false, jump to else-branch
+	;; If-then-else 213: (c) Then-branch
+	;; Return statement 210 from not: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 0 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		0				; Copy the value
 
-	;; Return statement 125 from not: (b) Copy single-word return value into place
+	;; Return statement 210 from not: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 125 from not: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 210 from not: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_not_epilogue						; Return to caller
-	JUMP		_not_branch_128_end						; Jump over else-branch
-	;; If-then-else128: (d) Else-branch
-_not_branch_128_else:
-	;; Return statement 127 from not: (a) Evaluate the expression and prepare the destination
+	JUMP		_not_branch_213_end						; Jump over else-branch
+	;; If-then-else213: (d) Else-branch
+_not_branch_213_else:
+	;; Return statement 212 from not: (a) Evaluate the expression and prepare the destination
 	;; Push integer value 1 onto stack
 	SUBUS		%SP		%SP		4		; Push word space
 	COPY		*%SP		1				; Copy the value
 
-	;; Return statement 127 from not: (b) Copy single-word return value into place
+	;; Return statement 212 from not: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 127 from not: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 212 from not: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_not_epilogue						; Return to caller
-	;; If-then-else 128: (e) End
-_not_branch_128_end:
-	NOOP								; Placeholder for if-then-else 128
+	;; If-then-else 213: (e) End
+_not_branch_213_end:
+	NOOP								; Placeholder for if-then-else 213
 _procedure_not_epilogue:
 	;; Callee for not: (epilogue) Pop locals and return
 
@@ -511,17 +910,17 @@ _procedure_+:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      ADD	 *%G0	*%FP	*%G1	; result = x + y
 	;; Statement #1 of begin-end statement
-	;; Return statement 140 from +: (a) Evaluate the expression and prepare the destination
+	;; Return statement 225 from +: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 140 from +: (b) Copy single-word return value into place
+	;; Return statement 225 from +: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 140 from +: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 225 from +: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_+_epilogue						; Return to caller
 _procedure_+_epilogue:
 	;; Callee for +: (epilogue) Pop locals and return
@@ -542,17 +941,17 @@ _procedure_-:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      SUB	 *%G0	*%FP	*%G1	; result = x - y
 	;; Statement #1 of begin-end statement
-	;; Return statement 152 from -: (a) Evaluate the expression and prepare the destination
+	;; Return statement 237 from -: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 152 from -: (b) Copy single-word return value into place
+	;; Return statement 237 from -: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 152 from -: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 237 from -: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_-_epilogue						; Return to caller
 _procedure_-_epilogue:
 	;; Callee for -: (epilogue) Pop locals and return
@@ -573,17 +972,17 @@ _procedure_*:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      MUL	 *%G0	*%FP	*%G1	; result = x * y
 	;; Statement #1 of begin-end statement
-	;; Return statement 164 from *: (a) Evaluate the expression and prepare the destination
+	;; Return statement 249 from *: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 164 from *: (b) Copy single-word return value into place
+	;; Return statement 249 from *: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 164 from *: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 249 from *: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_*_epilogue						; Return to caller
 _procedure_*_epilogue:
 	;; Callee for *: (epilogue) Pop locals and return
@@ -604,17 +1003,17 @@ _procedure_/:
        ADDUS	 %G1	%FP	4	; %G1 = &y
 	      DIV	 *%G0	*%FP	*%G1	; result = x / y
 	;; Statement #1 of begin-end statement
-	;; Return statement 176 from /: (a) Evaluate the expression and prepare the destination
+	;; Return statement 261 from /: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: result
 
 	;; Evaluate dynamic variable result
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 176 from /: (b) Copy single-word return value into place
+	;; Return statement 261 from /: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 176 from /: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 261 from /: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_/_epilogue						; Return to caller
 _procedure_/_epilogue:
 	;; Callee for /: (epilogue) Pop locals and return
@@ -682,7 +1081,7 @@ _procedure_==:
 	;; Call to =: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
 	;; Statement #1 of begin-end statement
-	;; Return statement 197 from ==: (a) Evaluate the expression and prepare the destination
+	;; Return statement 282 from ==: (a) Evaluate the expression and prepare the destination
 	;; Call to not: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to not: (prologue b) Evaluate and push arguments
@@ -705,10 +1104,10 @@ _procedure_==:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to not: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		12		; Pop args/pfp/ra
-	;; Return statement 197 from ==: (b) Copy single-word return value into place
+	;; Return statement 282 from ==: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 197 from ==: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 282 from ==: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_==_epilogue						; Return to caller
 _procedure_==_epilogue:
 	;; Callee for ==: (epilogue) Pop locals and return
@@ -776,17 +1175,17 @@ _procedure_!=:
 	;; Call to =: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
 	;; Statement #1 of begin-end statement
-	;; Return statement 216 from !=: (a) Evaluate the expression and prepare the destination
+	;; Return statement 301 from !=: (a) Evaluate the expression and prepare the destination
 	;; Identifier evaluation: difference
 
 	;; Evaluate dynamic variable difference
 	SUBUS		%SP		%SP		4		; Push space for resulting value, %SP = dst
 	ADDUS		%G0		%FP		-4		; %G0 = src = %FP + offset
 	COPY		*%SP		*%G0				; *dst = *src
-	;; Return statement 216 from !=: (b) Copy single-word return value into place
+	;; Return statement 301 from !=: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 216 from !=: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 301 from !=: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_!=_epilogue						; Return to caller
 _procedure_!=_epilogue:
 	;; Callee for !=: (epilogue) Pop locals and return
@@ -854,7 +1253,7 @@ _procedure_<:
 	;; Call to =: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
 	;; Statement #1 of begin-end statement
-	;; Return statement 238 from <: (a) Evaluate the expression and prepare the destination
+	;; Return statement 323 from <: (a) Evaluate the expression and prepare the destination
 	;; Call to >>: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to >>: (prologue b) Evaluate and push arguments
@@ -882,10 +1281,10 @@ _procedure_<:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to >>: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; Return statement 238 from <: (b) Copy single-word return value into place
+	;; Return statement 323 from <: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 238 from <: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 323 from <: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_<_epilogue						; Return to caller
 _procedure_<_epilogue:
 	;; Callee for <: (epilogue) Pop locals and return
@@ -901,7 +1300,7 @@ _procedure_>:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 260 from >: (a) Evaluate the expression and prepare the destination
+	;; Return statement 345 from >: (a) Evaluate the expression and prepare the destination
 	;; Call to not: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to not: (prologue b) Evaluate and push arguments
@@ -993,10 +1392,10 @@ _procedure_>:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to not: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		12		; Pop args/pfp/ra
-	;; Return statement 260 from >: (b) Copy single-word return value into place
+	;; Return statement 345 from >: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 260 from >: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 345 from >: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_>_epilogue						; Return to caller
 _procedure_>_epilogue:
 	;; Callee for >: (epilogue) Pop locals and return
@@ -1012,7 +1411,7 @@ _procedure_<=:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 280 from <=: (a) Evaluate the expression and prepare the destination
+	;; Return statement 365 from <=: (a) Evaluate the expression and prepare the destination
 	;; Call to or: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to or: (prologue b) Evaluate and push arguments
@@ -1088,10 +1487,10 @@ _procedure_<=:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to or: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		16		; Pop args/pfp/ra
-	;; Return statement 280 from <=: (b) Copy single-word return value into place
+	;; Return statement 365 from <=: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 280 from <=: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 365 from <=: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_<=_epilogue						; Return to caller
 _procedure_<=_epilogue:
 	;; Callee for <=: (epilogue) Pop locals and return
@@ -1107,7 +1506,7 @@ _procedure_>=:
 
 	;; Start begin-end statement
 	;; Statement #0 of begin-end statement
-	;; Return statement 296 from >=: (a) Evaluate the expression and prepare the destination
+	;; Return statement 381 from >=: (a) Evaluate the expression and prepare the destination
 	;; Call to not: (prologue a) Create base of caller frame segment
 	SUBUS		%SP		%SP		12		; Push pfp/ra[/rv] spaces
 	;; Call to not: (prologue b) Evaluate and push arguments
@@ -1153,10 +1552,10 @@ _procedure_>=:
 	COPY		%FP		*%G0				; Restore FP
 	;; Call to not: (epilogue b) Pop all but rv
 	ADDUS		%SP		%SP		12		; Pop args/pfp/ra
-	;; Return statement 296 from >=: (b) Copy single-word return value into place
+	;; Return statement 381 from >=: (b) Copy single-word return value into place
 	COPY		*%G0		*%SP				; Copy expression result into rv
 	ADDUS		%SP		%SP		4		; Pop expression result
-	;; Return statement 296 from >=: (c) Jump to callee epilogue, since return statements take effect immediately
+	;; Return statement 381 from >=: (c) Jump to callee epilogue, since return statements take effect immediately
 	JUMP		+_procedure_>=_epilogue						; Return to caller
 _procedure_>=_epilogue:
 	;; Callee for >=: (epilogue) Pop locals and return
